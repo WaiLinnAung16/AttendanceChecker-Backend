@@ -6,20 +6,17 @@ const AttendanceSchema = new mongoose.Schema({
     ref: "Subject",
     required: true,
   },
-  students: [
-    {
-      student: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-      status: {
-        type: String,
-        enum: ["present", "absent", "leave"],
-        required: true,
-      },
-    },
-  ],
+  student: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["present", "absent", "leave"],
+    required: true,
+  },
+  scanned_at: Date,
 });
 
 const Attendance = mongoose.model("Attendance", AttendanceSchema);

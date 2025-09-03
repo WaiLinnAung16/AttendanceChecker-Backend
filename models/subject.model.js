@@ -19,16 +19,11 @@ const SubjectSchema = new mongoose.Schema(
       maxLength: 5,
       unique: true,
     },
-    createdBy: {
+    assign_teacher: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    student_count: {
-      type: Number,
-      default: 0,
-    },
   },
   {
     timestamps: true,

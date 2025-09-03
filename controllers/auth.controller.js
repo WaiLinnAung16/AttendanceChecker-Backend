@@ -3,10 +3,12 @@ import { comparePassword, generateToken, hashPassword } from "../utils/auth.js";
 
 const signIn = async (req, res) => {
   const { email, password } = req.body;
+
   const existingUser = await User.findOne({ email });
   if (!existingUser) {
-    return res.status(404).json({ meassge: "Invalid Email" });
+    return res.status(404).json({ message: "Invalid Email" });
   }
+
   const isValidPassword = await comparePassword(
     password,
     existingUser.password
@@ -14,14 +16,23 @@ const signIn = async (req, res) => {
   if (!isValidPassword) {
     return res.status(404).json({ message: "Incorrect Password" });
   }
+
   const token = generateToken(existingUser._id);
 
-  res.status(200).json({ message: "Sign in successfully", token });
+  // convert mongoose document to plain object
+  const userData = existingUser.toObject();
+  delete userData.password; // remove password
+
+  res.status(200).json({
+    message: "Sign in successfully",
+    access_token: token,
+    user: userData,
+  });
 };
 
 const signUp = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     const registeredEmail = await User.findOne({ email });
     console.log(registeredEmail);
     if (registeredEmail) {
@@ -32,13 +43,19 @@ const signUp = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role,
     });
 
     await newUser.save();
     console.log(newUser);
     res.status(200).json({
       message: "Account created successfully.",
-      data: { id: newUser._id, name: newUser.name, email: newUser.email },
+      data: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
