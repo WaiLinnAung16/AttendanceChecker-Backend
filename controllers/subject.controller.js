@@ -3,19 +3,24 @@ import User from "../models/user.model.js";
 
 const getSubjects = async (req, res) => {
   try {
-    const { code } = req.query;
-    if (!code) {
-      const subjects = await Subject.find({}).populate(
-        "assign_teacher",
-        "name email"
-      );
+    const { code, userId } = req.query;
+    if (!code && !userId) {
+      const subjects = await Subject.find({})
+        .populate("assign_teacher", "name email")
+        .populate("students", "name email");
       res.status(200).json(subjects);
-    } else {
+    } else if (code) {
       const subject = await Subject.findOne({ code });
       if (!subject) {
         return res.status(404).json({ message: "Subject Not Found" });
       }
-      res.status(200).json(subject);
+      res.status(200).json([subject]);
+    } else if (userId) {
+      const user = await User.findById(userId).populate("subjects");
+      if (!user) {
+        return res.status(404).json({ message: "User Not Found" });
+      }
+      res.status(200).json(user.subjects);
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

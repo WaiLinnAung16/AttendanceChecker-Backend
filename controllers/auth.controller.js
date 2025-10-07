@@ -4,7 +4,10 @@ import { comparePassword, generateToken, hashPassword } from "../utils/auth.js";
 const signIn = async (req, res) => {
   const { email, password } = req.body;
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email }).populate(
+    "subjects",
+    "title description code students"
+  );
   if (!existingUser) {
     return res.status(404).json({ message: "Invalid Email" });
   }

@@ -12,10 +12,22 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getTeachers = async (req, res) => {
+  try {
+    const teachers = await User.find({ role: "teacher" }).populate(
+      "subjects",
+      "title description code students"
+    );
+    res.status(200).json(teachers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getSingleUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate("subjects");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -39,4 +51,4 @@ const updateUser = async (req, res) => {
   }
 };
 
-export { getUsers, getSingleUser, updateUser };
+export { getUsers, getSingleUser, updateUser, getTeachers };
